@@ -1,1 +1,7 @@
 /chat-app-client/node_modules
+
+.DS_Store
+
+/chat-app-client/.DS_Store
+
+/server/.DS_Store
