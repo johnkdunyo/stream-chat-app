@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChannelList, useChatContext } from 'stream-chat-react';
 import Cookies from 'universal-cookie';
 
@@ -33,13 +33,22 @@ const SideBar = ({logout}) => (
 const CompanyHeader = () => (
     <div className='channel-list__header'>
         <p className='channel-list__header__text'>Medicap Pages</p>
-
     </div>
 )
 
+const customChannelTeamFilter = (channels) => {
+    return channels.filter((channel) => channel.type === 'team')
+}
 
-const ChannelListContainer = ({ isCreating, setIsCreating, setIsEditing, setCreateType}) => {
+const customChannelMessageFilter = (channels) => {
+    return channels.filter((channel) => channel.type === 'message')
+}
 
+const ChannelListContent = ({ isCreating, setIsCreating, setIsEditing, setCreateType}) => {
+
+    const { client } = useChatContext();
+
+    const filters = { members : {$in:[client.userID]}};
 
     const logout = () => {
         cookies.remove("token");
@@ -60,8 +69,8 @@ const ChannelListContainer = ({ isCreating, setIsCreating, setIsEditing, setCrea
             <CompanyHeader />
             <ChannelSearch />
             <ChannelList
-                filters={{}}
-                channelRenderFilterFn={() => {}}
+                filters={filters}
+                channelRenderFilterFn={customChannelTeamFilter}
                 List={(listProps)=>(
                     <TeamChannelList
                     { ...listProps} 
@@ -82,8 +91,8 @@ const ChannelListContainer = ({ isCreating, setIsCreating, setIsEditing, setCrea
 
 
             <ChannelList
-                filters={{}}
-                channelRenderFilterFn={() => {}}
+                filters={filters}
+                channelRenderFilterFn={customChannelMessageFilter}
                 List={(listProps)=>(
                     <TeamChannelList
                     { ...listProps} 
@@ -106,6 +115,38 @@ const ChannelListContainer = ({ isCreating, setIsCreating, setIsEditing, setCrea
         </div>
     </React.Fragment>
   )
+}
+
+
+const ChannelListContainer = ({setCreateType, setIsCreating, setIsEditing}) => {
+    const [toggleContainer, setToggleContainer] = useState(false);
+
+
+    return (
+        <React.Fragment>
+        <div className='channel-list__container'>
+            <ChannelListContent
+                setIsCreating={setIsCreating}
+                setCreateType={setCreateType}
+                setIsEditing={setIsEditing}
+            />
+        </div>
+
+        {/* <div className='channel-list__container-responsive'
+            style={{left: toggleContainer ? "0%" : "-89%", backgroundColor: "#005fff" }}
+        >
+            <div className='channel-list__container-toggle' onClick={setToggleContainer((prevToggle) => !prevToggle)}></div>
+            <ChannelListContent
+                setIsCreating={setIsCreating}
+                setCreateType={setCreateType}
+                setIsEditing={setIsEditing}
+                setToggleContainer={setToggleContainer}
+            />
+
+        </div> */}
+        </React.Fragment>
+    )
+
 }
 
 export default ChannelListContainer
